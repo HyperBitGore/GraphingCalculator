@@ -83,56 +83,203 @@ int main() {
 		}
 		std::cout << "Index: " << equation[i].pos << " Value: " << equation[i].val << " Constant: " << equation[i].consta << std::endl;
 	}
-	int output = 0;
 	//need to figure out how to fix order of operations to be correct instead of kinda correct
 	if (!calcline) {
+		int output = 0;
 		for (int i = 0; i < equation.size(); i++) {
+			int nextnum = i + 1;
 			switch (equation[i].consta) {
 			case '^':
-				output = std::pow(equation[i - 1].val, equation[i + 1].val);
+				for (int k = i + 1; k < equation.size(); k++) {
+					if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+						nextnum = k;
+						break;
+					}
+				}
+				output = std::pow(equation[i - 1].val, equation[nextnum].val);
 				equation[i + 1].val = output;
+				equation[i - 1].val = 0;
+				equation[i].val = 0;
+				equation[i].consta = 0;
 				break;
 			case '!':
 				output = factorial(equation[i - 1].val);
-				equation[i + 1].val = output;
+				equation[i].val = output;
+				equation[i].consta = 0;
 				break;
 			}
 		}
-		for (int i = 0; i < equation.size(); i++) {
-			switch (equation[i].consta) {
-			case '*':
-				output = equation[i - 1].val * equation[i + 1].val;
-				equation[i + 1].val = output;
-				break;
-			case '/':
-				output = equation[i - 1].val / equation[i + 1].val;
-				equation[i + 1].val = output;
-				break;
+			for (int i = 0; i < equation.size(); i++) {
+				int nextnum = i + 1;
+				switch (equation[i].consta) {
+				case '*':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val * equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].consta = 0;
+					break;
+				case '/':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val / equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				}
 			}
-		}
-		for (int i = 0; i < equation.size(); i++) {
-			switch (equation[i].consta) {
-			case '+':
-				output = equation[i - 1].val + equation[i + 1].val;
-				equation[i + 1].val = output;
-				break;
-			case '-':
-				output = equation[i - 1].val - equation[i + 1].val;
-				equation[i + 1].val = output;
-				break;
+			for (int i = 0; i < equation.size(); i++) {
+				int nextnum = i + 1;
+				switch (equation[i].consta) {
+				case '+':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val + equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				case '-':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val - equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				}
 			}
-		}
-		point p = { 0, 0 };
-		p.y = output;
-		std::cout << p.y << std::endl;
-		bpoints.push_back(p);
+
+			point p = { 0, 0 };
+			p.x = 0;
+			p.y = output;
+			std::cout << p.y << std::endl;
+			//std::cout << p.y << std::endl;
+			bpoints.push_back(p);
 	}//make this do actual graphing, input i where x value is in equation and solve
 	else {
-		for (int i = 0; i < 100; i++) {
-			
-			
-		}
+		std::vector<consts> equa(equation);
+		for (int j = 0; j < 1000; j++) {
+			for (int i = 0; i < equation.size(); i++) {
+				if (std::isalpha(equation[i].consta)) {
+					equation[i].val = j;
+				}
+			}
+			int output = 0;
+			for (int i = 0; i < equation.size(); i++) {
+				int nextnum = i + 1;
+				switch (equation[i].consta) {
+				case '^':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = std::pow(equation[i - 1].val, equation[nextnum].val);
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				case '!':
+					output = factorial(equation[i - 1].val);
+					equation[i].val = output;
+					equation[i].consta = 0;
+					break;
+				}
+			}
+			for (int i = 0; i < equation.size(); i++) {
+				int nextnum = i + 1;
+				switch (equation[i].consta) {
+				case '*':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val * equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].consta = 0;
+					break;
+				case '/':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val / equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				}
+			}
+			for (int i = 0; i < equation.size(); i++) {
+				int nextnum = i + 1;
+				switch (equation[i].consta) {
+				case '+':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val + equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				case '-':
+					for (int k = i + 1; k < equation.size(); k++) {
+						if (equation[k].val != 0 && validInp(equation[k].consta) == -1) {
+							nextnum = k;
+							break;
+						}
+					}
+					output = equation[i - 1].val - equation[nextnum].val;
+					equation[i + 1].val = output;
+					equation[i - 1].val = 0;
+					equation[i].val = 0;
+					equation[i].consta = 0;
+					break;
+				}
+			}
 
+				point p = { 0, 0 };
+				p.x = j;
+				p.y = output;
+				std::cout << p.y << std::endl;
+				//std::cout << p.y << std::endl;
+				bpoints.push_back(p);
+				equation = equa;
+			}
 	}
 	while (!exitf) {
 		while (SDL_PollEvent(&e)) {
@@ -151,7 +298,7 @@ int main() {
 		SDL_RenderDrawLine(rend, 400, 400, 400, 800);
 		delta = edit.getDelta();
 		for (auto& i : bpoints) {
-			edit.setPixelRGBA(surf, i.x, i.y, 255, 0, 150, 255);
+			edit.setPixelRGBASafe(surf, i.x+400, -i.y+400, 255, 0, 150, 255, 800, 800);
 		}
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, surf);
 		SDL_RenderCopy(rend, tex, NULL, &trect);
