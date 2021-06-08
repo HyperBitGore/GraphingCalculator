@@ -11,11 +11,28 @@ int main() {
 	SDL_Event e;
 	std::vector<consts> equation;
 	std::vector<point> bpoints;
+	std::vector<point> lines;
 	SDL_Rect trect = { 0, 0, 800, 800 };
 	SDL_Rect camera = { 0, 0, 800, 800 };
 	std::string inp;
 	std::cout << "Input equation: ";
 	std::cin >> inp;
+	for (int i = 400; i < 2000; i++) {
+		point l = { i, 400 };
+		lines.push_back(l);
+	}
+	for (int i = 400; i > -2000; i--) {
+		point l = { i, 400 };
+		lines.push_back(l);
+	}
+	for (int i = 400; i < 2000; i++) {
+		point l = { 400, i };
+		lines.push_back(l);
+	}
+	for (int i = 400; i > -2000; i--) {
+		point l = { 400, i };
+		lines.push_back(l);
+	}
 	int index = 0;
 	for (int i = 0; i < inp.size(); i++) {
 		if (validInp(inp[i]) == 0) {
@@ -65,6 +82,8 @@ int main() {
 			bpoints.push_back(p);
 			}
 	}
+	const Uint8 *keys;
+	keys = SDL_GetKeyboardState(NULL);
 	while (!exitf) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
@@ -72,6 +91,19 @@ int main() {
 				exitf = true;
 				break;
 			}
+		}
+		SDL_PumpEvents();
+		if (keys[SDL_SCANCODE_RIGHT]) {
+			camera.x++;
+		}
+		else if (keys[SDL_SCANCODE_LEFT]) {
+			camera.x--;
+		}
+		else if (keys[SDL_SCANCODE_DOWN]) {
+			camera.y++;
+		}
+		else if (keys[SDL_SCANCODE_UP]) {
+			camera.y--;
 		}
 		int x, y;
 		if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
@@ -82,11 +114,10 @@ int main() {
 		SDL_RenderClear(rend);
 		edit.clearSurface(surf, 800, 800);
 		SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
-		SDL_RenderDrawLine(rend, 400, 400, 0, 400);
-		SDL_RenderDrawLine(rend, 400, 400, 800, 400);
-		SDL_RenderDrawLine(rend, 400, 400, 400, 0);
-		SDL_RenderDrawLine(rend, 400, 400, 400, 800);
 		delta = edit.getDelta();
+		for (auto& i : lines) {
+			edit.setPixelRGBASafe(surf, i.x + 400 - camera.x, -i.y + 400 - camera.y, 255, 255, 255, 255, 800, 800);
+		}
 		for (auto& i : bpoints) {
 			edit.setPixelRGBASafe(surf, i.x+400-camera.x, -i.y+400-camera.y, 255, 0, 150, 255, 800, 800);
 		}
